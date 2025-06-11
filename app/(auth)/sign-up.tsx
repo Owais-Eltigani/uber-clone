@@ -1,10 +1,11 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function SignUp() {
+export default function SignIn() {
   return (
-    <View>
-      <Text>SignUp</Text>
-    </View>
+    <SafeAreaView>
+      <Text>SignIn</Text>
+    </SafeAreaView>
   );
 }
