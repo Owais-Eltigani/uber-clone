@@ -2,11 +2,20 @@ import CustomButton from '@/components/CustomButton';
 import InputField from '@/components/InputField';
 import OAuth from '@/components/Oauth';
 import { icons, images } from '@/constants';
-import { Link } from 'expo-router';
+import { useUser } from '@clerk/clerk-expo';
+import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
 
 export default function SignIn() {
+  const { user } = useUser();
+
+  if (user) {
+    console.log('(auth)/sign-up', user);
+
+    router.replace('/(root)/(tabs)/home');
+  }
+
   const [form, setForm] = useState({
     email: '',
     password: '',
