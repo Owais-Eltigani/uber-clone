@@ -2,17 +2,18 @@ import CustomButton from '@/components/CustomButton';
 import InputField from '@/components/InputField';
 import OAuth from '@/components/Oauth';
 import { icons, images } from '@/constants';
-import { useUser } from '@clerk/clerk-expo';
-import { Link, router } from 'expo-router';
+import { useSignIn, useUser } from '@clerk/clerk-expo';
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, ScrollView, Text, View } from 'react-native';
+import { Alert, Image, ScrollView, Text, View } from 'react-native';
 
 export default function SignIn() {
   const { user } = useUser();
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const router = useRouter();
 
   if (user) {
-    console.log('(auth)/sign-up', user);
-
+    console.log('(auth)/sign-in', user);
     router.replace('/(root)/(tabs)/home');
   }
 
@@ -20,9 +21,41 @@ export default function SignIn() {
     email: '',
     password: '',
   });
-  //   console.log('(auth)/sign-up)', { form });
 
-  const onSignInPress = () => {};
+  //
+
+  //
+
+  const onSignInPress = async () => {
+    if (!isLoaded) return;
+
+    // Start the sign-in process using the email and password provided
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: form.email,
+        password: form.password,
+      });
+
+      // If sign-in process is complete, set the created session as active
+      // and redirect the user
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.replace('/(root)/(tabs)/home');
+      } else {
+        // If the status isn't complete, check why. User might need to
+        // complete further steps.
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (err: any) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2));
+      Alert.alert('error', err.message);
+    }
+  };
+
+  //
+
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="relative ">
