@@ -23,9 +23,6 @@ export default function SignIn() {
   });
 
   //
-
-  //
-
   const onSignInPress = async () => {
     if (!isLoaded) return;
 

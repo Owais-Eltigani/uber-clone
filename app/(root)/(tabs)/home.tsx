@@ -4,8 +4,11 @@ import RideCard from '@/components/RideCard';
 import { icons, images } from '@/constants';
 import { mockRides } from '@/constants/mockData';
 import { useFetch } from '@/lib/fetch';
+import { useLocationStore } from '@/store';
 import { Ride } from '@/types/type';
 import { useUser } from '@clerk/clerk-expo';
+import * as Location from 'expo-location';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -27,6 +30,33 @@ export default function Page() {
 
   const handleDestinationPress = () => {};
   const handleSignOut = () => {};
+
+  const [hasPermission, setHasPermission] = useState(false);
+  const { setUserLocation, setDestinationLocation } = useLocationStore();
+
+  //
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== 'granted') {
+        setHasPermission(false);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync();
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude!,
+        longitude: location.coords.longitude!,
+      });
+
+      setUserLocation({
+        latitude: location.coords.latitude!,
+        longitude: location.coords.longitude!,
+        address: `${address[0].name} ${address[0].region}`,
+      });
+    })();
+  });
 
   //
   return (
@@ -82,7 +112,7 @@ export default function Page() {
               <Text className="text-xl font-JakartaBold mt-5 mb-3">
                 Your current location
               </Text>
-              <View className="flex flex-row items-center bg-transparent h-[300px]">
+              <View className="flex flex-row items-center bg-transparent h-[300px] w-">
                 <Map />
               </View>
             </>
