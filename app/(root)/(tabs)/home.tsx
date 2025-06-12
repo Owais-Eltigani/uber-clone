@@ -13,6 +13,7 @@ export default function Page() {
       <View className="flex">
         <SignedIn>
           <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+
           <SignOutButton />
         </SignedIn>
         <SignedOut>

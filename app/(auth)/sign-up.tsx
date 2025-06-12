@@ -2,6 +2,7 @@ import CustomButton from '@/components/CustomButton';
 import InputField from '@/components/InputField';
 import OAuth from '@/components/Oauth';
 import { icons, images } from '@/constants';
+import { fetchAPI } from '@/lib/fetch';
 import { useSignUp, useUser } from '@clerk/clerk-expo';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,8 +14,7 @@ export default function SignIn() {
   const { user } = useUser();
 
   if (user) {
-    console.log('(auth)/sign-up', user);
-
+    // console.log('(auth)/sign-up', user);
     router.replace('/(root)/(tabs)/home');
   }
 
@@ -26,7 +26,6 @@ export default function SignIn() {
   });
 
   //
-  const [pendingVerification, setPendingVerification] = useState(false);
   const [verification, setVerification] = useState({
     state: 'default',
     error: '',
@@ -50,9 +49,7 @@ export default function SignIn() {
       // Send user an email with verification code
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
 
-      // Set 'pendingVerification' to true to display second form
       // and capture OTP code
-      //   setPendingVerification(true);
       setVerification({
         ...verification,
         state: 'pending',
@@ -79,7 +76,16 @@ export default function SignIn() {
       if (signUpAttempt.status === 'complete') {
         await setActive({ session: signUpAttempt.createdSessionId });
         setVerification({ ...verification, state: 'success' });
-        // router.replace('/')
+
+        //? calling the endpoint to create a user in the database
+        await fetchAPI('/(api)/user', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: form.username,
+            email: form.email,
+            clerk_id: signUpAttempt.createdUserId,
+          }),
+        });
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
