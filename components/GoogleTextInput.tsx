@@ -1,4 +1,5 @@
 import { useLocationStore } from '@/store';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
@@ -9,7 +10,13 @@ import {
   View,
 } from 'react-native';
 
-export default function GoogleTextInput() {
+export default function GoogleTextInput({
+  editable,
+  initialLocation,
+}: {
+  editable?: boolean;
+  initialLocation?: string;
+}) {
   const [input, setInput] = useState('');
   const [distination, setDestination] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -32,7 +39,7 @@ export default function GoogleTextInput() {
 
           const res = await data.json();
           if (res) {
-            console.log('googletextinput:prediction:res: ', res.predictions);
+            // console.log('googletextinput:prediction:res: ', res.predictions);
             setSuggestions(res.predictions || []); // Assuming the API returns a "results" array
           } else {
             console.warn('OLA Maps API request failed:');
@@ -54,19 +61,24 @@ export default function GoogleTextInput() {
     setInput(suggestion.description);
     setDestination(true);
     setSuggestions([]); // Clear suggestions after selection
-    // TODO: Update location store with selected coordinates
+
+    //
     setDestinationLocation({
       latitude: suggestion.geometry.location.lat,
       longitude: suggestion.geometry.location.lon,
-      address: suggestion.main_text,
+      address: suggestion.description,
     });
-  };
 
+    // push to find ride screen.
+    router.push('/(root)/findRide');
+  };
+  // TODO: add search logo to left of component and X to right of component
   return (
     <View style={styles.container}>
       <TextInput
         placeholder="Search your location"
-        value={input}
+        value={initialLocation ?? input}
+        editable={editable}
         onChangeText={text => {
           setDestination(false);
           setInput(text);

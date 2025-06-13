@@ -22,26 +22,28 @@ export default function Map() {
     destinationLongitude,
   });
 
-  const { selectedDriver, setDrivers } = useDriverStore();
+  const { selectedDriver, setDrivers, drivers } = useDriverStore();
 
   const [markerPointer, setMarkerPointer] = useState<MarkerData[]>([]);
 
   //
   useEffect(() => {
-    if (Array.isArray(mockDrivers)) {
+    //
+    setDrivers(mockDrivers);
+    if (Array.isArray(drivers)) {
       if (!userLatitude || !userLongitude) {
         return;
       }
 
       const markers = generateMarkersFromData({
-        data: mockDrivers,
+        data: drivers,
         userLatitude,
         userLongitude,
       });
 
       setMarkerPointer(markers);
     }
-  }, [mockDrivers]);
+  }, []);
 
   //
 
