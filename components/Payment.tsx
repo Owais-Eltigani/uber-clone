@@ -39,6 +39,7 @@ const Payment = ({
     if (error) {
       console.log(error);
       Alert.alert(`Error code: ${error.code}`, error.message);
+      router.replace('/(root)/(tabs)/home');
     } else {
       setSuccess(true);
     }
@@ -155,7 +156,6 @@ const Payment = ({
 
           //
           openPaymentSheet();
-          router.replace('/(root)/(tabs)/home');
         }}
       />
 
